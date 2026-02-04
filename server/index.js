@@ -20,7 +20,8 @@ dotEnv.config()
 const app = express()
 app.use(express.json())
 app.use(cors({
-    origin:process.env.CLIENT_URL || "http://localhost:5177",
+    origin:["http://localhost:5177",
+    "https://merry-rugelach-79b1ef.netlify.app"],
     credentials:true
 }))
 app.use(cookieParser())
