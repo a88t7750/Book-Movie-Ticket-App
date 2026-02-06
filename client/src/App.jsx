@@ -26,19 +26,22 @@ function App() {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    console.log("book ticket")
     async function fetchCurrentUser() {
       try {
         const user = await getCurrentUser();
         if (user) {
           dispatch(setUserData(user));
         }
-        setLoading(false);
+        
       } catch (error) {
         console.error(error);
+      }finally{
+        setLoading(false);
       }
     }
     fetchCurrentUser();
-  }, []);
+  }, [dispatch]);
 
   if (loading) {
     return (
@@ -47,6 +50,7 @@ function App() {
       </div>
     );
   }
+console.log("APP MOUNTED");
 
   return (
     <>

@@ -18,7 +18,7 @@ function Navbar() {
   useEffect(() => {
     (async () => {
       const user = await getCurrentUser();
-      dispatch(setUserData(user || null));
+      dispatch(setUserData(user));
     })();
   }, [dispatch]);
 
