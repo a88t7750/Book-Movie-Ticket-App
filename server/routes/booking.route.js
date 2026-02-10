@@ -4,7 +4,7 @@ const User = require("../models/user.model");
 const Booking = require("../models/booking.model");
 const isAuth = require("../middlewares/authMiddleware");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-const {sendBookingConfirmationEmail} = require('../services/emailService')
+const { sendBookingConfirmationEmail } = require('../services/emailService')
 
 const bookingRouter = express.Router();
 
@@ -68,12 +68,10 @@ bookingRouter.post("/create-checkout-session", isAuth, async (req, res) => {
       shipping_address_collection: {
         allowed_countries: ["IN"],
       },
-      success_url: `${
-        process.env.CLIENT_URL || "http://localhost:5173"
-      }/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${
-        process.env.CLIENT_URL || "http://localhost:5173"
-      }/bookshow/${showId}`,
+      success_url: `${process.env.CLIENT_URL
+        }/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.CLIENT_URL
+        }/bookshow/${showId}`,
       metadata: {
         bookingId: booking._id.toString(),
         showId: showId,
@@ -110,7 +108,7 @@ const confirmBooking = async (session) => {
 
     if (!booking) {
       console.log("Booking not found for session:", session.id);
-      return({
+      return ({
         success: false,
         message: "Booking not found",
       });
@@ -124,7 +122,7 @@ const confirmBooking = async (session) => {
           path: "show",
           populate: [{ path: "movie" }, { path: "theatre" }],
         });
-      return({
+      return ({
         success: true,
         message: "Booking already confirmed",
         booking: populateBooking,
@@ -135,7 +133,7 @@ const confirmBooking = async (session) => {
     if (!show) {
       booking.status = "failed";
       await booking.save();
-      return({
+      return ({
         success: false,
         message: "Show for this booking not found",
       });
@@ -148,7 +146,7 @@ const confirmBooking = async (session) => {
     if (conflictingseats.length > 0) {
       booking.status = "failed";
       await booking.save();
-      return({
+      return ({
         success: false,
         message: `Seats ${conflictingseats.join(", ")} are already booked`,
       });
@@ -170,7 +168,7 @@ const confirmBooking = async (session) => {
       });
 
 
-      // Send booking confirmation email (non-blocking)
+    // Send booking confirmation email (non-blocking)
     sendBookingConfirmationEmail(populateBooking)
       .then(result => {
         if (result.success) {
@@ -183,7 +181,7 @@ const confirmBooking = async (session) => {
         console.error('Error sending booking confirmation email:', error);
       });
 
-    return({
+    return ({
       success: true,
       message: "Booking completed",
       booking: populateBooking,
