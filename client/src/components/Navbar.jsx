@@ -29,6 +29,7 @@ function Navbar() {
   const onLogout = async () => {
     try {
       const response = await logout();
+      console.log(response)
       if(response && response.success){
         message.success(response.message)
         dispatch(setUserData(null))
