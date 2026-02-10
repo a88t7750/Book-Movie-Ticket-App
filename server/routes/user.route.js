@@ -93,14 +93,15 @@ userRouter.post("/logout", isAuth, async (req, res) => {
       sameSite: isProd ? 'none' : 'lax',
       secure: isProd,
     });
-    res.send({
+
+    return res.send({
       success: true,
       message: "Logged out successfully",
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({ 
       success: false,
-      message: "Error logging out"
+      message: "Error logging out" 
     });
   }
 });
