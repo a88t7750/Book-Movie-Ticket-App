@@ -88,7 +88,11 @@ userRouter.get('/current-user', isAuth, async (req, res) => {
 })
 userRouter.post("/logout", isAuth, async (req, res) => {
   try {
-    res.clearCookie('jwtToken');
+    res.clearCookie('jwtToken', {
+      httpOnly: true,
+      sameSite: isProd ? 'none' : 'lax',
+      secure: isProd,
+    });
     res.send({
       success: true,
       message: "Logged out successfully",

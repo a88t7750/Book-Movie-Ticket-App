@@ -28,13 +28,15 @@ function Navbar() {
 
   const onLogout = async () => {
     try {
-      await logout();
-      dispatch(setUserData(null));
-      navigate('/login');
+      const response = await logout();
+      if(response && response.success){
+        message.success(response.message)
+        dispatch(setUserData(null))
+        navigate('/login')
+      }
     } catch (error) {
-      console.error('Logout error:', error);
-      dispatch(setUserData(null));
-      navigate('/login');
+      console.error(error)
+      message.error(response.message)
     }
   };
 
