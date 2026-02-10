@@ -27,7 +27,7 @@ export const login = async(values)=>{
 
 export const getCurrentUser = async()=>{
     try {
-       const response = await api.get('/api/auth/current-user' ,{withCredentials:true} )
+       const response = await api.get('/api/auth/current-user')
        // Ensure consistent user data structure
        console.log("Booking Status ",response)
        if (response.data && typeof response.data === 'object') {
@@ -48,7 +48,7 @@ export const getCurrentUser = async()=>{
 
 export const logout = async()=>{
     try {
-       const response = await api.post('/api/auth/logout' ,{withCredentials:true} )
+       const response = await api.post('/api/auth/logout')
        return response.data
     } catch (error) {
         console.log('Error logging out:', error.response?.data || error.message)
