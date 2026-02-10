@@ -144,7 +144,7 @@ const sendBookingConfirmationEmail = async (bookingData) => {
 
 // Email template for password reset
 const createPasswordResetEmailTemplate = (resetToken, userName) => {
-  const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5177'}/reset-password?token=${resetToken}`;
+  const resetUrl = `${process.env.CLIENT_URL || 'https://merry-rugelach-79b1ef.netlify.app'}/reset-password?token=${resetToken}`;
   
   const html = `
     <!DOCTYPE html>
