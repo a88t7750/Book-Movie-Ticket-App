@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const isAuth = require("../middlewares/authMiddleware.js");
 const { sendPasswordResetEmail } = require("../services/emailService.js");
+const isProd = process.env.NODE_ENV === 'production';
 
 const userRouter = express.Router();
 
@@ -51,35 +52,39 @@ userRouter.post("/login", async (req, res) => {
       });
     }
 
-    const token = jwt.sign({userId:user._id},process.env.JWT_SECRET,{expiresIn:'10d'})
-    res.cookie('jwtToken',token,{
-      httpOnly:true,
-    })
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '10d' })
+
+
+    res.cookie('jwtToken', token, {
+      httpOnly: true,
+      sameSite: isProd ? 'none' : 'lax',
+      secure: isProd, // true on Render (HTTPS), false locally
+    });
     res.send({
       success: true,
       message: "You have successfully logged in!",
-      user:user
+      user: user
     });
   } catch (error) {
     res.status(500).send({ message: error.message });
   }
 });
 
-userRouter.get('/current-user',isAuth,async (req,res)=>{    
+userRouter.get('/current-user', isAuth, async (req, res) => {
   const userId = req.userId
-  if(userId === undefined){
-    return res.status(401).json({message:"Not authorized, no token"})
+  if (userId === undefined) {
+    return res.status(401).json({ message: "Not authorized, no token" })
   }
   try {
     const verifiedUser = await User.findById(userId).select("-password");
-    if(!verifiedUser){
-      return res.status(404).json({message:'User not found'})
+    if (!verifiedUser) {
+      return res.status(404).json({ message: 'User not found' })
     }
     res.json(verifiedUser)
   } catch (error) {
-    return res.status(500).json({message:"Server error"})
+    return res.status(500).json({ message: "Server error" })
   }
-  
+
 })
 userRouter.post("/logout", isAuth, async (req, res) => {
   try {
@@ -89,9 +94,9 @@ userRouter.post("/logout", isAuth, async (req, res) => {
       message: "Logged out successfully",
     });
   } catch (error) {
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      message: "Error logging out" 
+      message: "Error logging out"
     });
   }
 });
@@ -100,7 +105,7 @@ userRouter.post("/logout", isAuth, async (req, res) => {
 userRouter.post("/forgot-password", async (req, res) => {
   try {
     const { email } = req.body;
-    
+
     if (!email) {
       return res.status(400).send({
         success: false,
@@ -109,7 +114,7 @@ userRouter.post("/forgot-password", async (req, res) => {
     }
 
     const user = await User.findOne({ email });
-    
+
     // For security, don't reveal if user exists or not
     if (!user) {
       return res.send({
@@ -130,13 +135,13 @@ userRouter.post("/forgot-password", async (req, res) => {
 
     // Send email
     const emailResult = await sendPasswordResetEmail(user.email, user.name, resetToken);
-    
+
     if (!emailResult.success) {
       // If email fails, clear the token
       user.resetPasswordToken = null;
       user.resetPasswordExpires = null;
       await user.save();
-      
+
       return res.status(500).send({
         success: false,
         message: "Failed to send reset email. Please try again later.",
@@ -148,9 +153,9 @@ userRouter.post("/forgot-password", async (req, res) => {
       message: "If an account with that email exists, we have sent a password reset link.",
     });
   } catch (error) {
-    res.status(500).send({ 
+    res.status(500).send({
       success: false,
-      message: error.message 
+      message: error.message
     });
   }
 });
@@ -159,7 +164,7 @@ userRouter.post("/forgot-password", async (req, res) => {
 userRouter.post("/reset-password", async (req, res) => {
   try {
     const { token, password } = req.body;
-    
+
     if (!token || !password) {
       return res.status(400).send({
         success: false,
@@ -206,9 +211,9 @@ userRouter.post("/reset-password", async (req, res) => {
       message: "Password has been reset successfully. You can now login with your new password.",
     });
   } catch (error) {
-    res.status(500).send({ 
+    res.status(500).send({
       success: false,
-      message: error.message 
+      message: error.message
     });
   }
 });
