@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getCurrentUser, logout } from '../calls/authCalls';
 import { setUserData } from '../redux/userSlice';
 import { Link, useNavigate } from 'react-router-dom';
-import { Layout, Input, Button, Avatar, Typography, Space } from 'antd';
+import { Layout, Input, Button, Avatar, Typography, Space, message } from 'antd';
 import { UserOutlined, LogoutOutlined, SearchOutlined } from '@ant-design/icons';
 import './Navbar.css';
 
